@@ -1,0 +1,66 @@
+#!/bin/sh
+
+#Declaration of time values in minutes.
+STUDY=25
+PAUSE=5
+MUTE=false
+
+play_notification() {
+	aplay -d 5 $HOME/.local/share/sounds/alarm.wav&
+}
+
+time_left="%im left of %s \n"
+
+fstart() {
+	while true
+	do
+		read -d '' -t 0.001
+		echo -e "\a"
+		echo -n "Go Study!"
+		read
+
+		for ((i=$STUDY; i>0; i--))
+		do
+			printf "$time_left" $i "study"
+			sleep 1m
+		done
+		! $MUTE && play_notification
+
+		read -d '' -t 0.001
+		echo -e "\a"
+		echo -n "Study over!"
+		read
+
+		for ((i=$PAUSE; i>0; i--))
+		do
+			printf "$time_left" $i "pause"
+			sleep 1m
+		done
+		! $MUTE && play_notification
+	done
+}
+
+
+echo -e "
+                ############################################################################
+                ####                                                                    ####
+                ####                              Pomodoro                              ####
+                ####              A timer based on the Pomodoro Technique.              ####
+                ####    The Pomodoro Technique is a time management method developed    ####
+		####               by Francesco Cirillo in the late 1980s.              ####
+		####                                  🍅                                ####
+                ####                                                                    ####
+                ############################################################################"
+
+select option in Study Help Exit; do
+	case $option in
+		Study)
+			fstart
+			;;
+		Help)
+			;;
+		Exit)
+			exit $1
+			;;
+	esac
+done
